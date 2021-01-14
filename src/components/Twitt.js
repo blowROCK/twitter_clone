@@ -1,4 +1,4 @@
-import { firestoreService } from "myFire";
+import { firestoreService, storageService } from "myFire";
 import React, { useState } from "react";
 
 const Twitt = ({ twittObj, isOwner }) =>{
@@ -8,6 +8,9 @@ const Twitt = ({ twittObj, isOwner }) =>{
     const onDeleted = async () => {
         if(window.confirm("Delete this Twitt?")){
             await firestoreService.doc(`twitts/${twittObj.id}`).delete();
+            if(twittObj.fileUrl){
+                await storageService.refFromURL(twittObj.fileUrl).delete();
+            }
         }
     }
     const toggleEditing = () => {
@@ -36,8 +39,10 @@ const Twitt = ({ twittObj, isOwner }) =>{
                     :
                     <h4>{twittObj.text}</h4>
                 }
+                { twittObj.fileUrl && 
+                    <img src={twittObj.fileUrl} width="200px" alt="fileImage"></img>
+                }
             </div>
-            
             { isOwner && 
                     <div>
                         <button onClick={onDeleted}>Delete</button>
